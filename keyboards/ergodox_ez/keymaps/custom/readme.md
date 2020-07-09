@@ -1,6 +1,8 @@
 # The custom keymap for Ergodox EZ
 
 ## How to Build
+You can get the pre-built firmwares from [Releases](https://github.com/andooown/qmk_firmware/releases).
+
 ### Docker
 - Required:
   - Docker
