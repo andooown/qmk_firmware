@@ -30,6 +30,7 @@ jobs:
         name: firmware
         path: firmware
     - name: Create tag
+      id: create-tag
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         REPO: ${{ github.repository }}
@@ -43,6 +44,7 @@ jobs:
           -d "{\"tag\": \"${timestamp}\", \"message\": \"${timestamp}\", \"object\": \"${COMMIT_HASH}\", \"type\": \"commit\"}"
 
         echo "::set-output name=tag::${timestamp}"
+        echo "::set-output name=formatted-timestamp::$(date +'%Y/%m/%d %H:%M:%S')"
     - name: Create Release
       uses: actions/create-release@v1
       env:
@@ -51,6 +53,6 @@ jobs:
         tag_name: ${{ steps.create-tag.outputs.tag }}
         release_name: ${{ steps.create-tag.outputs.tag }}
         body: |
-          Build from ${{ github.sha }}
+          Build from ${{ github.sha }} at ${{ steps.create-tag.outputs.formatted-timestamp }}
         draft: false
         prerelease: false
