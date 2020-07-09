@@ -1,15 +1,24 @@
-# ErgoDox EZ Default Configuration
+# The custom keymap for Ergodox EZ
 
-## Changelog
+## How to Build
+### Docker
+- Required:
+  - Docker
 
-* Dec 2016:
-  * Added LED keys
-  * Refreshed layout graphic, comes from http://configure.ergodox-ez.com now.
-* Sep 22, 2016:
-  * Created a new key in layer 1 (bottom-corner key) that resets the EEPROM.
-* Feb 2, 2016 (V1.1): 
-  * Made the right-hand quote key double as Cmd/Win on hold. So you get ' when you tap it, " when you tap it with Shift, and Cmd or Win when you hold it. You can then use it as a modifier, or just press and hold it for a moment (and then let go) to send a single Cmd or Win keystroke (handy for opening the Start menu on Windows).
+```
+$ docker run -e KEYBOARD=ergodox_ez -e KEYMAP=custom --rm -v $(pwd):/qmk_firmware:rw edasque/qmk_firmware
+```
 
-This is what we ship with out of the factory. :) The image says it all:
+### Makefile
+```
+$ make ergodox:custom
+```
 
-![Default](https://i.imgur.com/Be53jH7.png)
+## How to Install
+- Required:
+  - teensy_loader_cli
+    - To install, run `brew install teensy_loader_cli`
+
+```
+$ teensy_loader_cli --mcu=atmega32u4 -w -v .build/ergodox_ez_custom.hex
+```
