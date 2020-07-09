@@ -30,4 +30,5 @@ jobs:
         name: firmware
         path: firmware
     - run: |
-        ls -alh firmware/
+        timestamp=$(TZ=-9 date +%Y%m%d%H%M%S)
+        echo $timestamp
