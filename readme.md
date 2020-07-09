@@ -1,4 +1,6 @@
 # Quantum Mechanical Keyboard Firmware
+![Build and Release](https://github.com/andooown/qmk_firmware/workflows/Build%20and%20Release/badge.svg?event=push)
+
 Fork from https://github.com/qmk/qmk_firmware
 
 ## Original keymaps
