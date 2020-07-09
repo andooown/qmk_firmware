@@ -38,13 +38,6 @@ jobs:
         timestamp=$(date +%Y%m%d%H%M%S)
         echo "Create tag: ${timestamp}"
 
-        curl -s -X POST "https://api.github.com/repos/${REPO}/git/tags" \
+        curl -fsS -X POST "https://api.github.com/repos/${REPO}/git/tags" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
-          -d @- << EOS
-            {
-              "tag": "${timestamp}",
-              "message": "${timestamp}",
-              "object": "${COMMIT_HASH}",
-              "type": "commit"
-            }
-            EOS
+          -d '{"tag": "${timestamp}", "message": "${timestamp}", "object": "${COMMIT_HASH}", "type": "commit"}'
