@@ -11,8 +11,14 @@ jobs:
     strategy:
       matrix:
         keyboard: [ergodox_ez, mint60]
+        keymap: [custom]
     steps:
     - uses: actions/checkout@v2
     - name: Build with Docker
       run: |
-        docker run -e KEYBOARD=${{ matrix.keyboard }} -e KEYMAP=custom -v $(pwd):/qmk_firmware:rw edasque/qmk_firmware
+        docker run -e KEYBOARD=${{ matrix.keyboard }} -e KEYMAP=${{ matrix.keymap }} -v $(pwd):/qmk_firmware:rw edasque/qmk_firmware
+    - name: Upload built firmware
+      uses: actions/upload-artifact@v1
+      with:
+        name: firmware
+        path: .build/${{ matrix.keyboard }}_${{ matrix.keymap }}
