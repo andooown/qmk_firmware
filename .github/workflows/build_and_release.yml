@@ -41,3 +41,16 @@ jobs:
         curl -fsS -X POST "https://api.github.com/repos/${REPO}/git/tags" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -d "{\"tag\": \"${timestamp}\", \"message\": \"${timestamp}\", \"object\": \"${COMMIT_HASH}\", \"type\": \"commit\"}"
+
+        echo "::set-output name=tag::${timestamp}"
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.create-tag.outputs.tag }}
+        release_name: ${{ steps.create-tag.outputs.tag }}
+        body: |
+          Build from ${{ github.sha }}
+        draft: false
+        prerelease: false
