@@ -1,0 +1,58 @@
+name: Build and Release
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        keyboard: [ergodox_ez, mint60]
+        keymap: [custom]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build with Docker
+      run: |
+        docker run -e KEYBOARD=${{ matrix.keyboard }} -e KEYMAP=${{ matrix.keymap }} -v $(pwd):/qmk_firmware:rw edasque/qmk_firmware
+    - uses: actions/upload-artifact@v1
+      with:
+        name: firmware
+        path: .build/${{ matrix.keyboard }}_${{ matrix.keymap }}.hex
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/download-artifact@v1
+      with:
+        name: firmware
+        path: firmware
+    - name: Create tag
+      id: create-tag
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
+        COMMIT_HASH: ${{ github.sha }}
+      run: |
+        timestamp=$(date +%Y%m%d%H%M%S)
+        echo "Create tag: ${timestamp}"
+
+        curl -fsS -X POST "https://api.github.com/repos/${REPO}/git/tags" \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -d "{\"tag\": \"${timestamp}\", \"message\": \"${timestamp}\", \"object\": \"${COMMIT_HASH}\", \"type\": \"commit\"}"
+
+        echo "::set-output name=tag::${timestamp}"
+        echo "::set-output name=formatted-timestamp::$(date +'%Y/%m/%d %H:%M:%S')"
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.create-tag.outputs.tag }}
+        release_name: ${{ steps.create-tag.outputs.tag }}
+        body: |
+          Build from ${{ github.sha }} at ${{ steps.create-tag.outputs.formatted-timestamp }}
+        draft: false
+        prerelease: false
