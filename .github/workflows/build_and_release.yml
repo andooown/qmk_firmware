@@ -29,11 +29,22 @@ jobs:
       with:
         name: firmware
         path: firmware
-    - name: Add tag
+    - name: Create tag
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         REPO: ${{ github.repository }}
         COMMIT_HASH: ${{ github.sha }}
       run: |
         timestamp=$(date +%Y%m%d%H%M%S)
-        curl -s -X POST "https://api.github.com/repos/${REPO}/git/refs" -H "Authorization: token ${GITHUB_TOKEN}" -d '{"ref": "refs/tags/${timestamp}", "sha": "${COMMIT_HASH}"}'
+        echo "Create tag: ${timestamp}"
+
+        curl -s -X POST "https://api.github.com/repos/${REPO}/git/tags" \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -d @- << EOS
+            {
+              "tag": "${timestamp}",
+              "message": "${timestamp}",
+              "object": "${COMMIT_HASH}",
+              "type": "commit"
+            }
+            EOS
