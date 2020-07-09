@@ -39,7 +39,7 @@ jobs:
         REPO: ${{ github.repository }}
         COMMIT_HASH: ${{ github.sha }}
       run: |
-        timestamp=$(date +%Y%m%d%H%M%S)
+        timestamp=$(TZ=Asia/Tokyo date +%Y%m%d%H%M%S)
         echo "Create tag: ${timestamp}"
 
         curl -fsS -X POST "https://api.github.com/repos/${REPO}/git/tags" \
@@ -47,7 +47,7 @@ jobs:
           -d "{\"tag\": \"${timestamp}\", \"message\": \"${timestamp}\", \"object\": \"${COMMIT_HASH}\", \"type\": \"commit\"}" 1> /dev/null
 
         echo "::set-output name=tag::${timestamp}"
-        echo "::set-output name=formatted-timestamp::$(date +'%Y/%m/%d %H:%M:%S')"
+        echo "::set-output name=formatted-timestamp::$(TZ=Asia/Tokyo date +'%Y/%m/%d %H:%M:%S')"
     - name: Create release
       id: create-release
       uses: actions/create-release@v1
