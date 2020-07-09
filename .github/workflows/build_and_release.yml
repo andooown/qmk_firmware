@@ -29,6 +29,9 @@ jobs:
       with:
         name: firmware
         path: firmware
+    - name: Archive built firmwares
+      run: |
+        zip -j ./firmware.zip firmware/*
     - name: Create tag
       id: create-tag
       env:
@@ -41,11 +44,12 @@ jobs:
 
         curl -fsS -X POST "https://api.github.com/repos/${REPO}/git/tags" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
-          -d "{\"tag\": \"${timestamp}\", \"message\": \"${timestamp}\", \"object\": \"${COMMIT_HASH}\", \"type\": \"commit\"}"
+          -d "{\"tag\": \"${timestamp}\", \"message\": \"${timestamp}\", \"object\": \"${COMMIT_HASH}\", \"type\": \"commit\"}" 1> /dev/null
 
         echo "::set-output name=tag::${timestamp}"
         echo "::set-output name=formatted-timestamp::$(date +'%Y/%m/%d %H:%M:%S')"
-    - name: Create Release
+    - name: Create release
+      id: create-release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,3 +60,12 @@ jobs:
           Build from ${{ github.sha }} at ${{ steps.create-tag.outputs.formatted-timestamp }}
         draft: false
         prerelease: false
+    - name: Upload built firmwares
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create-release.outputs.upload_url }}
+        asset_path: ./firmware.zip
+        asset_name: firmware.zip
+        asset_content_type: application/zip
