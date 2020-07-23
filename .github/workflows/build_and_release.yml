@@ -14,6 +14,9 @@ jobs:
         keymap: [custom]
     steps:
     - uses: actions/checkout@v2
+    - name: Sync submodules
+      run: |
+        make git-submodule
     - name: Build with Docker
       run: |
         docker run -e KEYBOARD=${{ matrix.keyboard }} -e KEYMAP=${{ matrix.keymap }} -v $(pwd):/qmk_firmware:rw edasque/qmk_firmware
